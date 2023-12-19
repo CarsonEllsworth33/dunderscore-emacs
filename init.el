@@ -1,3 +1,19 @@
+;; The dunderscore emacs config
+;; ----------------------------------------------------------
+;; Table of Contents
+;; 1 - Initializing Environment
+;; 2 - Packages
+;; 3 - Key Bindings
+;; ----------------------------------------------------------
+;; Contributor(s)
+;; Carson Ellsworth
+;; ----------------------------------------------------------
+
+
+
+;; Initializing Emacs Environment
+;; ----------------------------------------------------------
+
 ;; Inhibit startup message
 (setq inhibit-startup-message t)
 
@@ -33,6 +49,12 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+;; Packages to be used by the config
+;; ----------------------------------------------------------
+;; (load dunderpackages.el)
+;; For now just load packages in init.el
+
+
 (use-package auto-package-update
   :config
   (setq auto-package-update-delete-old-versions t)
@@ -44,10 +66,13 @@
 (setq auto-save-file-name-transforms
       `((".*",(no-littering-expand-var-file-name "auto-save/") t)))
 
-;; Packages to be used by the config
-;; (load dunderpackages.el)
 
-;; For now just load packages in init.el
+(use-package which-key
+  :init
+  (which-key-mode)
+  :config
+  (setq which-key-idle-delay 0.3))
+
 (use-package evil
   :init
   (setq evil-want-integration t)
@@ -152,4 +177,57 @@
     (setq projectile-project-search-path '("~/workspace/git-repos")))
   (setq projectile-switch-project-action #'projectile-dired))
 
+;; Enable vertico
+(use-package vertico
+  :init
+  (vertico-mode 1)
 
+  ;; Different scroll margin
+  ;; (setq vertico-scroll-margin 0)
+
+  ;; Show more candidates
+  ;; (setq vertico-count 20)
+
+  ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-resize t)
+
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  ;; (setq vertico-cycle t)
+  )
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode 1))
+
+(use-package orderless
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
+  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+
+(use-package ivy-rich
+  :ensure counsel
+  :init
+  (ivy-rich-mode 1))
+
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+	 ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f" . counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+
+
+;; Key Bindings
+;; ----------------------------------------------------------
+(defun my-prefix-translations (_mode mode-keymaps &rest _rest)
+  (evil-collection-translate-key 'normal mode-keymaps
+    "C-SPC" "SPC"))
+
+(add-hook 'evil-collection-setup-hook #'my-prefix-translations)
