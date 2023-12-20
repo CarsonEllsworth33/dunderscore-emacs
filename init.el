@@ -8,10 +8,15 @@
 ;; Contributor(s)
 ;; Carson Ellsworth
 ;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
 
+;; Code
 
 
 ;; Initializing Emacs Environment
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
 ;; ----------------------------------------------------------
 
 ;; Inhibit startup message
@@ -31,6 +36,7 @@
 
 (column-number-mode)
 (global-display-line-numbers-mode t)
+(setq display-line-numbers-type 'relative)
 
 ;; Initialize package sources
 (require 'package)
@@ -49,11 +55,14 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+
 ;; Packages to be used by the config
 ;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+
 ;; (load dunderpackages.el)
 ;; For now just load packages in init.el
-
 
 (use-package auto-package-update
   :config
@@ -165,6 +174,8 @@
   :config
   (pyvenv-mode 1))
 
+(use-package ripgrep)
+
 (use-package projectile
   :diminish projectile-mode
   :config (projectile-mode)
@@ -201,13 +212,13 @@
   (savehist-mode 1))
 
 (use-package orderless
+  :ensure t
   :init
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-  (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+  (icomplete-mode)
+  :custom (completion-styles '(orderless flex)))
 
 (use-package ivy-rich
   :ensure counsel
@@ -215,19 +226,112 @@
   (ivy-rich-mode 1))
 
 (use-package counsel
+  :after helpful
   :bind (("M-x" . counsel-M-x)
 	 ("C-x b" . counsel-ibuffer)
 	 ("C-x C-f" . counsel-find-file)
 	 :map minibuffer-local-map
 	 ("C-r" . 'counsel-minibuffer-history))
   :config
-  (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+  (setq ivy-initial-inputs-alist nil) ;; Don't start searches with ^
+  (setq counsel-describe-function-function #'helpful-callable)
+  (setq counsel-describe-variable-function #'helpful-variable))
+
+(use-package helpful)
+
+(use-package corfu
+  ;; Optional customizations
+  ;; :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+  ;; Enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.  This is recommended since Dabbrev can
+  ;; be used globally (M-/).  See also the customization variable
+  ;; `global-corfu-modes' to exclude certain modes.
+  :init
+  (global-corfu-mode))
+
+(use-package dirvish)
+
+;; Defuns
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+
+(setq dunderscore-theme-list '(doom-tokyo-night doom-palenight doom-old-hope doom-snazzy doom-gruvbox))
+(setq dunderscore-theme-iterator 0)
+(defun dunderscore-swap-theme () (interactive)
+  (setq dunderscore-theme-iterator (mod (+ dunderscore-theme-iterator 1) (length dunderscore-theme-list)))
+  (load-theme (nth dunderscore-theme-iterator dunderscore-theme-list)))
 
 
 ;; Key Bindings
 ;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+
 (defun my-prefix-translations (_mode mode-keymaps &rest _rest)
   (evil-collection-translate-key 'normal mode-keymaps
     "C-SPC" "SPC"))
 
 (add-hook 'evil-collection-setup-hook #'my-prefix-translations)
+
+;; Helpful Key Bindings
+(global-set-key (kbd "C-h f") #'helpful-callable)
+(global-set-key (kbd "C-h v") #'helpful-variable)
+(global-set-key (kbd "C-h k") #'helpful-key)
+(global-set-key (kbd "C-h x") #'helpful-command)
+(global-set-key (kbd "C-h F") #'helpful-function)
+(global-set-key (kbd "C-c C-d") #'helpful-at-point)
+
+
+;; Tree-sitter 
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+
+;; Language Aliases
+(setq treesit-language-source-alist
+   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+     (cmake "https://github.com/uyha/tree-sitter-cmake")
+     (css "https://github.com/tree-sitter/tree-sitter-css")
+     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+     (go "https://github.com/tree-sitter/tree-sitter-go")
+     (html "https://github.com/tree-sitter/tree-sitter-html")
+     (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+     (json "https://github.com/tree-sitter/tree-sitter-json")
+     (make "https://github.com/alemuller/tree-sitter-make")
+     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+     (python "https://github.com/tree-sitter/tree-sitter-python")
+     (toml "https://github.com/tree-sitter/tree-sitter-toml")
+     
+     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+     (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+;; Check to see if language is installed
+;; (treesit-language-available-p '<language>)
+;; example: (treesit-language-available-p 'python)
+
+;; Configuration
+(setq major-mode-remap-alist
+ '((yaml-mode . yaml-ts-mode)
+   ;; (docker-mode . docker-ts-mode)
+   (bash-mode . bash-ts-mode)
+   (js2-mode . js-ts-mode)
+   (typescript-mode . typescript-ts-mode)
+   (json-mode . json-ts-mode)
+   (css-mode . css-ts-mode)
+   (python-mode . python-ts-mode)))
