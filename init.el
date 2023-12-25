@@ -265,37 +265,6 @@
 
 (use-package dirvish)
 
-;; Defuns
-;; ----------------------------------------------------------
-;; ----------------------------------------------------------
-;; ----------------------------------------------------------
-
-(setq dunderscore-theme-list '(doom-tokyo-night doom-palenight doom-old-hope doom-snazzy doom-gruvbox))
-(setq dunderscore-theme-iterator 0)
-(defun dunderscore-swap-theme () (interactive)
-  (setq dunderscore-theme-iterator (mod (+ dunderscore-theme-iterator 1) (length dunderscore-theme-list)))
-  (load-theme (nth dunderscore-theme-iterator dunderscore-theme-list)))
-
-
-;; Key Bindings
-;; ----------------------------------------------------------
-;; ----------------------------------------------------------
-;; ----------------------------------------------------------
-
-(defun my-prefix-translations (_mode mode-keymaps &rest _rest)
-  (evil-collection-translate-key 'normal mode-keymaps
-    "C-SPC" "SPC"))
-
-(add-hook 'evil-collection-setup-hook #'my-prefix-translations)
-
-;; Helpful Key Bindings
-(global-set-key (kbd "C-h f") #'helpful-callable)
-(global-set-key (kbd "C-h v") #'helpful-variable)
-(global-set-key (kbd "C-h k") #'helpful-key)
-(global-set-key (kbd "C-h x") #'helpful-command)
-(global-set-key (kbd "C-h F") #'helpful-function)
-(global-set-key (kbd "C-c C-d") #'helpful-at-point)
-
 
 ;; Tree-sitter 
 ;; ----------------------------------------------------------
@@ -335,3 +304,38 @@
    (json-mode . json-ts-mode)
    (css-mode . css-ts-mode)
    (python-mode . python-ts-mode)))
+
+
+;; Defuns
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+
+(setq dunderscore-theme-list '(doom-tokyo-night doom-palenight doom-old-hope doom-snazzy doom-gruvbox))
+(setq dunderscore-theme-iterator 0)
+(defun dunderscore-swap-theme () (interactive)
+  (setq dunderscore-theme-iterator (mod (+ dunderscore-theme-iterator 1) (length dunderscore-theme-list)))
+  (load-theme (nth dunderscore-theme-iterator dunderscore-theme-list)))
+
+
+;; Key Bindings
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+;; ----------------------------------------------------------
+
+(defun my-prefix-translations (_mode mode-keymaps &rest _rest)
+  (evil-collection-translate-key 'normal mode-keymaps
+    "C-SPC" "SPC"))
+
+(add-hook 'evil-collection-setup-hook #'my-prefix-translations)
+
+;; Helpful Key Bindings
+(global-set-key (kbd "C-h f") #'helpful-callable)
+(global-set-key (kbd "C-h v") #'helpful-variable)
+(global-set-key (kbd "C-h k") #'helpful-key)
+(global-set-key (kbd "C-h x") #'helpful-command)
+(global-set-key (kbd "C-h F") #'helpful-function)
+(global-set-key (kbd "C-c C-d") #'helpful-at-point)
+
+;; Unset Bindings
+(keymap-unset evil-motion-state-map "<SPC>")
