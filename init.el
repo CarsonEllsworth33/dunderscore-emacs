@@ -325,7 +325,7 @@
 
 (defun my-prefix-translations (_mode mode-keymaps &rest _rest)
   (evil-collection-translate-key 'normal mode-keymaps
-    "C-SPC" "SPC"))
+    (kbd "C-SPC") (kbd "SPC")))
 
 (add-hook 'evil-collection-setup-hook #'my-prefix-translations)
 
@@ -338,4 +338,21 @@
 (global-set-key (kbd "C-c C-d") #'helpful-at-point)
 
 ;; Unset Bindings
-(keymap-unset evil-motion-state-map "<SPC>")
+;;(keymap-unset evil-motion-state-map (kbd "SPC"))
+
+;; Keymaps
+(defvar ds/temporary-test-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "f") #'("find" . find-file))
+    map))
+
+
+;; Dunderscore Key Bindings
+(evil-set-leader 'normal (kbd "SPC"))
+
+(evil-define-key 'normal 'global
+  (kbd "<leader> f") 'ds/temporary-test-map
+  (kbd "<leader> TAB") 'ace-window)
+
+(evil-define-key 'normal 'global
+  (kbd "<leader> SPC") 'counsel-M-x)
