@@ -14,6 +14,7 @@
 ;; Code
 
 
+;; 1.
 ;; Initializing Emacs Environment
 ;; ----------------------------------------------------------
 ;; ----------------------------------------------------------
@@ -56,6 +57,7 @@
 (setq use-package-always-ensure t)
 
 
+;; 2.
 ;; Packages to be used by the config
 ;; ----------------------------------------------------------
 ;; ----------------------------------------------------------
@@ -318,6 +320,7 @@
   (load-theme (nth dunderscore-theme-iterator dunderscore-theme-list)))
 
 
+;; 3.
 ;; Key Bindings
 ;; ----------------------------------------------------------
 ;; ----------------------------------------------------------
@@ -341,18 +344,26 @@
 ;;(keymap-unset evil-motion-state-map (kbd "SPC"))
 
 ;; Keymaps
-(defvar ds/temporary-test-map
+(defvar ds/files-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "f") #'("find" . find-file))
     map))
 
+(defvar ds/buffers-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "n") #'("next" . evil-next-buffer))
+    (define-key map (kbd "p") #'("prev" . evil-prev-buffer))
+    (define-key map (kbd "N") #'("new" . evil-buffer-new))
+    map))
 
 ;; Dunderscore Key Bindings
 (evil-set-leader 'normal (kbd "SPC"))
 
 (evil-define-key 'normal 'global
-  (kbd "<leader> f") 'ds/temporary-test-map
-  (kbd "<leader> TAB") 'ace-window)
+  (kbd "<leader> f") (cons "files" ds/files-map)
+  (kbd "<leader> TAB") (cons "switch window" 'ace-window)
+  (kbd "<leader> b") (cons "buffers" ds/buffers-map)
+  )
 
 (evil-define-key 'normal 'global
   (kbd "<leader> SPC") 'counsel-M-x)
