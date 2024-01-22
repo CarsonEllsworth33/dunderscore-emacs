@@ -1,0 +1,2 @@
+* install yaml-mode
+* make key-binding to auto insert tags: ellsworth for yaml mode
