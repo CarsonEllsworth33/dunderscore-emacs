@@ -355,6 +355,7 @@
     (define-key map (kbd "p") #'("prev" . evil-prev-buffer))
     (define-key map (kbd "N") #'("new" . evil-buffer-new))
     (define-key map (kbd "k") #'("kill" . kill-this-buffer))
+    (define-key map (kbd "b") #'("switch" . counsel-switch-buffer))
     map))
 
 (defvar ds/windows-map
