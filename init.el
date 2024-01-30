@@ -70,7 +70,7 @@
   :config
   (setq auto-package-update-delete-old-versions t)
   (setq auto-package-update-hide-results t)
-  (auto-package-update-maybe))
+  (auto-package-update-now))
 
 (use-package no-littering)
 
@@ -83,6 +83,7 @@
   (which-key-mode)
   :config
   (setq which-key-idle-delay 0.3))
+
 
 (use-package evil
   :init
@@ -148,6 +149,16 @@
   ;;(setq vterm-shell "zsh")                       ;; Set this to customize the shell to launch
   (setq vterm-max-scrollback 10000))
 
+(use-package lsp-mode
+  ;; :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  ;; (setq lsp-keymap-prefix (kbd "<leader> l"))
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (python-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
 (use-package dap-mode
   ;; Uncomment the config below if you want all UI panes to be hidden by default!
   ;; :custom
@@ -175,6 +186,24 @@
   :after python-mode
   :config
   (pyvenv-mode 1))
+
+(use-package company)
+(use-package company-jedi
+  :after company
+  :config
+  (add-to-list 'company-backends 'company-jedi)
+  (add-to-list 'company-backends '(company-jedi company-files)))
+
+(use-package python-black)
+
+(use-package flycheck)
+
+(use-package flycheck-mypy
+  :after flycheck
+  :config
+  (add-hook 'python-mode-hook 'flycheck-mode)
+  (add-to-list 'flycheck-disabled-checkers 'python-flake8)
+  (add-to-list 'flycheck-disabled-checkers 'python-pylint))
 
 (use-package ripgrep)
 
