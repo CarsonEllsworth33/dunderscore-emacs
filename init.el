@@ -187,9 +187,13 @@
   :config
   (pyvenv-mode 1))
 
-(use-package company)
+(use-package company
+  :config
+  (global-company-mode))
 (use-package company-jedi
   :after company
+  :init
+  (add-hook 'python-mode-hook 'company-jedi)
   :config
   (add-to-list 'company-backends 'company-jedi)
   (add-to-list 'company-backends '(company-jedi company-files)))
@@ -394,6 +398,12 @@
     (define-key map (kbd "/") #'("split below" . split-window-below))
     map))
 
+(defvar ds/python-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "b") #'("buffer" . python-black-buffer))
+    (define-key map (kbd "r") #'("region" . python-black-region))
+    map))
+
 ;; Dunderscore Key Bindings
 (evil-set-leader 'normal (kbd "SPC"))
 
@@ -403,6 +413,9 @@
   (kbd "<leader> b") (cons "buffers" ds/buffers-map)
   (kbd "<leader> w") (cons "windows" ds/windows-map)
   )
+
+(evil-define-key 'normal 'Python
+  (kbd "<leader> l") (cons "format" ds/python-map))
 
 (evil-define-key 'normal 'global
   (kbd "<leader> SPC") 'counsel-M-x)
