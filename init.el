@@ -270,6 +270,7 @@
   (icomplete-mode)
   :custom (completion-styles '(orderless flex)))
 
+(use-package ivy)
 (use-package ivy-rich
   :ensure counsel
   :init
