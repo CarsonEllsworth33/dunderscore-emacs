@@ -215,6 +215,7 @@
     python-mypy ""
     :command ("mypy"
               "--ignore-missing-imports"
+	      "--check-untyped-defs"
               source-original)
     :error-patterns
     ((error line-start (file-name) ":" line ": error:" (message) line-end))
