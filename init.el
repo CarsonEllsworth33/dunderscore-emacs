@@ -14,6 +14,7 @@
 ;; Code
 
 
+;; 1.
 ;; Initializing Emacs Environment
 ;; ----------------------------------------------------------
 ;; ----------------------------------------------------------
@@ -56,6 +57,7 @@
 (setq use-package-always-ensure t)
 
 
+;; 2.
 ;; Packages to be used by the config
 ;; ----------------------------------------------------------
 ;; ----------------------------------------------------------
@@ -68,7 +70,7 @@
   :config
   (setq auto-package-update-delete-old-versions t)
   (setq auto-package-update-hide-results t)
-  (auto-package-update-maybe))
+  (auto-package-update-now))
 
 (use-package no-littering)
 
@@ -81,6 +83,7 @@
   (which-key-mode)
   :config
   (setq which-key-idle-delay 0.3))
+
 
 (use-package evil
   :init
@@ -146,6 +149,16 @@
   ;;(setq vterm-shell "zsh")                       ;; Set this to customize the shell to launch
   (setq vterm-max-scrollback 10000))
 
+(use-package lsp-mode
+  ;; :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  ;; (setq lsp-keymap-prefix (kbd "<leader> l"))
+  :hook (;; replace XXX-mode with concrete major-mode(e. g. python-mode)
+         (python-mode . lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
 (use-package dap-mode
   ;; Uncomment the config below if you want all UI panes to be hidden by default!
   ;; :custom
@@ -173,6 +186,44 @@
   :after python-mode
   :config
   (pyvenv-mode 1))
+
+(use-package company
+  :config
+  (global-company-mode))
+(use-package company-jedi
+  :after company
+  :init
+  (add-hook 'python-mode-hook 'company-jedi)
+  :config
+  (add-to-list 'company-backends 'company-jedi)
+  (add-to-list 'company-backends '(company-jedi company-files)))
+
+(use-package python-black)
+
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
+(use-package flycheck-mypy
+  :after flycheck
+  :config
+  (add-hook 'python-mode-hook 'flycheck-mode)
+  (add-to-list 'flycheck-disabled-checkers 'python-flake8)
+  (add-to-list 'flycheck-disabled-checkers 'python-pylint))
+
+(flycheck-define-checker
+    python-mypy ""
+    :command ("mypy"
+              "--ignore-missing-imports"
+	      "--check-untyped-defs"
+              source-original)
+    :error-patterns
+    ((error line-start (file-name) ":" line ": error:" (message) line-end))
+    :modes python-mode)
+
+(add-hook 'after-init-hook #'global-flycheck-mode)
+(add-to-list 'flycheck-checkers 'python-mypy t)
+(flycheck-add-next-checker 'python-pylint 'python-mypy t)
 
 (use-package ripgrep)
 
@@ -220,6 +271,7 @@
   (icomplete-mode)
   :custom (completion-styles '(orderless flex)))
 
+(use-package ivy)
 (use-package ivy-rich
   :ensure counsel
   :init
@@ -303,7 +355,8 @@
    (typescript-mode . typescript-ts-mode)
    (json-mode . json-ts-mode)
    (css-mode . css-ts-mode)
-   (python-mode . python-ts-mode)))
+   ;; (python-mode . python-ts-mode)
+   ))
 
 
 ;; Defuns
@@ -318,6 +371,7 @@
   (load-theme (nth dunderscore-theme-iterator dunderscore-theme-list)))
 
 
+;; 3.
 ;; Key Bindings
 ;; ----------------------------------------------------------
 ;; ----------------------------------------------------------
@@ -341,18 +395,45 @@
 ;;(keymap-unset evil-motion-state-map (kbd "SPC"))
 
 ;; Keymaps
-(defvar ds/temporary-test-map
+(defvar ds/files-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "f") #'("find" . find-file))
     map))
 
+(defvar ds/buffers-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "n") #'("next" . evil-next-buffer))
+    (define-key map (kbd "p") #'("prev" . evil-prev-buffer))
+    (define-key map (kbd "N") #'("new" . evil-buffer-new))
+    (define-key map (kbd "k") #'("kill" . kill-this-buffer))
+    (define-key map (kbd "b") #'("switch" . counsel-switch-buffer))
+    map))
+
+(defvar ds/windows-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "d") #'("delete" . delete-window))
+    (define-key map (kbd "|") #'("split right" . split-window-right))
+    (define-key map (kbd "/") #'("split below" . split-window-below))
+    map))
+
+(defvar ds/python-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "b") #'("buffer" . python-black-buffer))
+    (define-key map (kbd "r") #'("region" . python-black-region))
+    map))
 
 ;; Dunderscore Key Bindings
 (evil-set-leader 'normal (kbd "SPC"))
 
 (evil-define-key 'normal 'global
-  (kbd "<leader> f") 'ds/temporary-test-map
-  (kbd "<leader> TAB") 'ace-window)
+  (kbd "<leader> f") (cons "files" ds/files-map)
+  (kbd "<leader> TAB") (cons "switch window" 'ace-window)
+  (kbd "<leader> b") (cons "buffers" ds/buffers-map)
+  (kbd "<leader> w") (cons "windows" ds/windows-map)
+  )
+
+(evil-define-key 'normal 'Python
+  (kbd "<leader> l") (cons "format" ds/python-map))
 
 (evil-define-key 'normal 'global
   (kbd "<leader> SPC") 'counsel-M-x)
