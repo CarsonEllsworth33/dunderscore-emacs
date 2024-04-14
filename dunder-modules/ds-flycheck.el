@@ -8,9 +8,7 @@
 (use-package flycheck-mypy
   :after flycheck
   :config
-  (add-hook 'python-mode-hook 'flycheck-mode)
-  (add-to-list 'flycheck-disabled-checkers 'python-flake8)
-  (add-to-list 'flycheck-disabled-checkers 'python-pylint))
+  (add-hook 'python-mode-hook 'flycheck-mode))
 
 (flycheck-define-checker
     python-mypy ""

@@ -47,5 +47,7 @@
   (require 'dap-node)
   (dap-node-setup)) ;; Automatically installs Node debug adapter if needed
 
+(use-package pylint)
+
 (provide 'ds-lsp)
 ;;; ds-lsp.el ends here
