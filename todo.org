@@ -2,3 +2,5 @@
 * make key-binding to auto insert tags: ellsworth for yaml mode
 * install python-black
 * unbind spc in magit mode
+* add keybinding for xref-find-definitions
+** Change major mode keybinding to free up Spacebar to run commands & q to quit out
